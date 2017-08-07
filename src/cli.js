@@ -11,6 +11,7 @@ import Analytics from './analytics'
 import Updater from './updater'
 import NotFound from './not_found'
 import Lock from './lock'
+import Hooks from './hooks'
 
 import MigrateV5Plugins from './plugins/migrator'
 
@@ -57,6 +58,7 @@ export default class Main {
       out.inspect(this.config)
     }
     this.lock = new Lock(out)
+    this.hooks = new Hooks({config: this.config})
   }
 
   async run () {
@@ -88,6 +90,7 @@ export default class Main {
       if (!Command) return new NotFound(out, this.argv).run()
       debug('out.done()')
       await out.done()
+      await this.hooks.run('prerun', {Command})
       debug('recording analytics')
       let analytics = new Analytics({config: this.config, out, plugins})
       await analytics.record(id)
