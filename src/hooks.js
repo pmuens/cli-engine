@@ -25,6 +25,7 @@ export default class Hooks {
   async run (name: string, args: Object) {
     for (let script of this.hooks[name] || []) {
       let hook = require(path.join(this.config.root, script))
+      args.config = this.config
       await hook(args)
     }
   }
